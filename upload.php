@@ -1,7 +1,10 @@
 <?php  
 if(isset($_POST['submit'])&&isset($_FILES['my_video'])){
+    require_once "./connect.php";
+    /*
     echo "<pre>";
     print_r($_FILES['my_video']);
+    */
     $video_name = $_FILES['my_video']['name'];
     $tmp_name = $_FILES['my_video']['tmp_name'];
     $error = $_FILES['my_video']['error'];
@@ -17,8 +20,13 @@ if(isset($_POST['submit'])&&isset($_FILES['my_video'])){
         $allowed_exts = array("mp4" , "webm" , "avi" ,"flv" ,"mkv");
         if(in_array($vid_ext_lc,$allowed_exts)){
             $new_video_name = uniqid("video-",true). '.' .$vid_ext_lc; 
-            $video_uploaded_path = 'uploads_videos/' . $new_video_name;
+            $video_uploaded_path = 'uploads/' . $new_video_name;
             move_uploaded_file($tmp_name,$video_uploaded_path);
+
+            // tawa nhezo l vid li uplodineha lel data base :
+            $sql = "INSERT INTO videos(video_url) VALUES ('$new_video_name')";
+            mysqli_query($conn,$sql);
+            header("Location: view.php");
         }else
         {
             $errorExtMsg = "you can't upload file of this type!";
